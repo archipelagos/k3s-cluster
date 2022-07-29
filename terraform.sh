@@ -88,8 +88,6 @@ FIRST_SERVER_NODE_TOKEN=$(ssh \
 # INFO: Add workers to cluster.
 for worker in ${WORKERS}
 do
-	echo \
-		Adding ${worker} to cluster
 	curl -sfL https://get.k3s.io | ssh \
 		${USER}@${worker} \
 		sh -s - agent \
