@@ -40,6 +40,18 @@ WORKERS="compute-arch-linux-0 compute-arch-linux-1 compute-arch-linux-2"
 NODES="${SERVERS} ${WORKERS}"
 
 #####################################################################
+# INFO: Sanity check section.
+#####################################################################
+
+# INFO: Check connection to each node.
+for host in ${NODES}
+do
+	ssh \
+		${USER}@${host} \
+		echo Connection ok!
+done
+
+#####################################################################
 # INFO: Cluster section.
 #####################################################################
 
