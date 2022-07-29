@@ -48,7 +48,7 @@ for host in ${NODES}
 do
 	ssh \
 		${USER}@${host} \
-		echo Connection ok!
+		echo Connection to ${host} as user ${USER} ok!
 done
 
 #####################################################################
