@@ -48,7 +48,7 @@ for host in ${NODES}
 do
 	ssh \
 		${USER}@${host} \
-		echo Connection ok!
+		echo Connection to ${host} as user ${USER} ok!
 done
 
 #####################################################################
@@ -64,7 +64,6 @@ do
 	if [ ${server} == ${FIRST_SERVER} ]
 	then
 		# INFO: Init new cluster on first server.
-		echo Init new cluster
 		curl -sfL https://get.k3s.io | ssh \
 			${USER}@${server} \
 			K3S_TOKEN=${CLUSTER_SECRET} \
@@ -72,7 +71,6 @@ do
 			--cluster-init
 	else
 		# INFO: Connect server to existing cluster.
-		echo Connect new server to existing cluster
 		curl -sfL https://get.k3s.io | ssh \
 			${USER}@${server} \
 			K3S_TOKEN=${CLUSTER_SECRET} \
@@ -90,8 +88,6 @@ FIRST_SERVER_NODE_TOKEN=$(ssh \
 # INFO: Add workers to cluster.
 for worker in ${WORKERS}
 do
-	echo \
-		Adding ${worker} to cluster
 	curl -sfL https://get.k3s.io | ssh \
 		${USER}@${worker} \
 		sh -s - agent \
