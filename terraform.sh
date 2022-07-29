@@ -31,45 +31,13 @@ CLUSTER_SECRET=$(cat /proc/sys/kernel/random/uuid)
 # INFO: Servers only (from remote nodes set). To run K3s in this mode, you must
 #       have an odd number of server nodes. It is recommended to start with
 #       three server nodes.
-SERVERS="control-arch-linux-0 control-arch-linux-1"
+SERVERS="control-arch-linux-0 control-arch-linux-1 control-arch-linux-2"
 
 # INFO: Workers only (from remote nodes set).
-WORKERS="compute-arch-linux-0 compute-arch-linux-1"
+WORKERS="compute-arch-linux-0 compute-arch-linux-1 compute-arch-linux-2"
 
 # INFO: All nodes (servers and workers).
 NODES="${SERVERS} ${WORKERS}"
-
-#####################################################################
-# INFO: Access section.
-# TODO: Move it into another script.
-#####################################################################
-
-# INFO: Clean remote ssh directory.
-#for host in ${NODES}
-#do
-#	echo \
-#		rm \
-#		-rf \
-#		/home/${USER}/.ssh/*
-#	ssh \
-#		${host} \
-#		rm \
-#		-rf \
-#		/home/${USER}/.ssh/*
-#done
-
-# INFO: Add only one authorized key.
-#for host in ${NODES}
-#do
-# TODO: cat ~/.ssh/id_rsa.pub | ssh control-arch-linux-1 cat >> ./temp
-#	echo \
-#		scp \
-#		/home/${USER}/.ssh/id_rsa.pub \
-#		${host}:/home/${USER}/.ssh/authorized_keys
-#	scp \
-#		/home/${USER}/.ssh/id_rsa.pub \
-#		${host}:/home/${USER}/.ssh/authorized_keys
-#done
 
 #####################################################################
 # INFO: Cluster section.
@@ -78,12 +46,12 @@ NODES="${SERVERS} ${WORKERS}"
 # INFO: Compute first server from set.
 FIRST_SERVER=${SERVERS%% *}
 
-# INFO: Add servers to cluster.
+# INFO: Build cluster.
 for server in ${SERVERS}
 do
 	if [ ${server} == ${FIRST_SERVER} ]
 	then
-		# INFO: Init new cluster.
+		# INFO: Init new cluster on first server.
 		echo Init new cluster
 		curl -sfL https://get.k3s.io | ssh \
 			${USER}@${server} \
@@ -91,7 +59,7 @@ do
 			sh -s - server \
 			--cluster-init
 	else
-		# INFO: Connect new server to existing cluster.
+		# INFO: Connect server to existing cluster.
 		echo Connect new server to existing cluster
 		curl -sfL https://get.k3s.io | ssh \
 			${USER}@${server} \
@@ -102,7 +70,7 @@ do
 	fi
 done
 
-# INFO: Get first server node token.
+# INFO: Get node token from first server.
 FIRST_SERVER_NODE_TOKEN=$(ssh \
 	${USER}@${FIRST_SERVER} \
 	sudo cat /var/lib/rancher/k3s/server/node-token)
