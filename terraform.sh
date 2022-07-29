@@ -25,6 +25,9 @@ set \
 # INFO: User on remote nodes.
 USER=sova
 
+# INFO: Preshared cluster secret.
+CLUSTER_SECRET=$(cat /proc/sys/kernel/random/uuid)
+
 # INFO: Servers only (from remote nodes set). To run K3s in this mode, you must
 #       have an odd number of server nodes. It is recommended to start with
 #       three server nodes.
@@ -58,6 +61,7 @@ NODES="${SERVERS} ${WORKERS}"
 # INFO: Add only one authorized key.
 #for host in ${NODES}
 #do
+# TODO: cat ~/.ssh/id_rsa.pub | ssh control-arch-linux-1 cat >> ./temp
 #	echo \
 #		scp \
 #		/home/${USER}/.ssh/id_rsa.pub \
@@ -74,14 +78,32 @@ NODES="${SERVERS} ${WORKERS}"
 # INFO: Compute first server from set.
 FIRST_SERVER=${SERVERS%% *}
 
-# INFO: Init cluster.
-curl -sfL https://get.k3s.io | ssh \
-	${USER}@${FIRST_SERVER} \
-	sh -s - server \
-	--cluster-init
+# INFO: Add servers to cluster.
+for server in ${SERVERS}
+do
+	if [ ${server} == ${FIRST_SERVER} ]
+	then
+		# INFO: Init new cluster.
+		echo Init new cluster
+		curl -sfL https://get.k3s.io | ssh \
+			${USER}@${server} \
+			K3S_TOKEN=${CLUSTER_SECRET} \
+			sh -s - server \
+			--cluster-init
+	else
+		# INFO: Connect new server to existing cluster.
+		echo Connect new server to existing cluster
+		curl -sfL https://get.k3s.io | ssh \
+			${USER}@${server} \
+			K3S_TOKEN=${CLUSTER_SECRET} \
+			sh -s - server \
+			--server \
+			https://${FIRST_SERVER}:6443
+	fi
+done
 
-# INFO: Get cluster secret.
-SECRET=$(ssh \
+# INFO: Get first server node token.
+FIRST_SERVER_NODE_TOKEN=$(ssh \
 	${USER}@${FIRST_SERVER} \
 	sudo cat /var/lib/rancher/k3s/server/node-token)
 
@@ -96,35 +118,6 @@ do
 		--server \
 		https://${FIRST_SERVER}:6443 \
 		--token \
-		${SECRET}
+		${FIRST_SERVER_NODE_TOKEN}
 done
-
-#curl -sfL https://get.k3s.io | K3S_TOKEN=K10ba9e35c3121e59030dcb77c8f06d5870d6a9e37905ee04c26e82b12f61bb2724::server:ada733fdb5009287ac72d01b23509345 sh -s - server --server https://control-arch-linux-0:6443
-
-#curl -sfL https://get.k3s.io | K3S_URL=https://control-arch-linux-0:6443 K3S_TOKEN=K10ba9e35c3121e59030dcb77c8f06d5870d6a9e37905ee04c26e82b12f61bb2724::server:ada733fdb5009287ac72d01b23509345 sh -
-
-#sudo k3s kubectl get nodes
-
-#####################################################################
-# INFO: control-arch-linux-0 - działa poprawnie (rekomendowana)
-#####################################################################
-
-#[sova@control-arch-linux-0 ~]$ curl -sfL https://get.k3s.io | sh -s - server --cluster-init
-
-#[sova@control-arch-linux-0 ~]$ sudo cat /var/lib/rancher/k3s/server/node-token
-#K105663297391eef07713d2a00f68e0ee914e39bc8fa04a49aeb4158ca3e6093e48::server:576efcd14da8ec00a2373dc26d1a87f0
-
-#####################################################################
-# INFO: compute-arch-linux-0 - działa poprawnie (wersja długa)
-#####################################################################
-
-#[sova@compute-arch-linux-0 ~]$ curl -sfL https://get.k3s.io | sh -
-#[sova@compute-arch-linux-0 ~]$ sudo systemctl stop k3s.service
-#[sova@compute-arch-linux-0 ~]$ sudo k3s agent --server https://control-arch-linux-0:6443 --token K107141caa5e2580f99170d389cbf03a964c7cc4c1ee9277d06cb91a38baadb8f10::server:3eb3a15048f04727229346b63e80d621
-
-#####################################################################
-# INFO: compute-arch-linux-0 - działa poprawnie (rekomendowana)
-#####################################################################
-
-#[sova@compute-arch-linux-0 ~]$ curl -sfL https://get.k3s.io | sh -s - agent --server https://control-arch-linux-0:6443 --token K105b40e4adf5f323d02e97b7893e601710f2551805585ca93f744adf82bc2d6f9e::server:0dd27e194c117ba414b85e239cf3b6a3
 
