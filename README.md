@@ -49,37 +49,37 @@ be used in `/etc/hostname` on node you are initializing.
 For server node no 1:
 
 ```console
-user@host:~$ ./init_node.sh control-arch-linux-0_net_addr control-arch-linux-0
+user@host:~$ ./init_node.sh control-arch-linux-0 control-arch-linux-0
 ```
 
 For server node no 2:
 
 ```console
-user@host:~$ ./init_node.sh control-arch-linux-1_net_addr control-arch-linux-1
+user@host:~$ ./init_node.sh control-arch-linux-1 control-arch-linux-1
 ```
 
 For server node no 3:
 
 ```console
-user@host:~$ ./init_node.sh control-arch-linux-2_net_addr control-arch-linux-2
+user@host:~$ ./init_node.sh control-arch-linux-2 control-arch-linux-2
 ```
 
 For worker node no 1:
 
 ```console
-user@host:~$ ./init_node.sh compute-arch-linux-0_net_addr compute-arch-linux-0
+user@host:~$ ./init_node.sh compute-arch-linux-0 compute-arch-linux-0
 ```
 
 For worker node no 2:
 
 ```console
-user@host:~$ ./init_node.sh compute-arch-linux-1_net_addr compute-arch-linux-1
+user@host:~$ ./init_node.sh compute-arch-linux-1 compute-arch-linux-1
 ```
 
 For worker node no 3:
 
 ```console
-user@host:~$ ./init_node.sh compute-arch-linux-2_net_addr compute-arch-linux-2
+user@host:~$ ./init_node.sh compute-arch-linux-2 compute-arch-linux-2
 ```
 
 At this point, each node:
@@ -111,19 +111,25 @@ Sometimes installation can fail. If any of nodes did not start K3S properly and 
 To uninstall K3S from server node, execute command:
 
 ```console
-user@host:~$ ssh control-arch-linux-0_net_addr k3s-uninstall.sh
+user@host:~$ ssh control-arch-linux-0 k3s-uninstall.sh
 ```
 
 To uninstall K3S from worker node, execute command:
 
 ```console
-user@host:~$ ssh control-arch-linux-0_net_addr k3s-agent-uninstall.sh
+user@host:~$ ssh control-arch-linux-0 k3s-agent-uninstall.sh
 ```
 
 To restart node, execute command:
 
 ```console
-user@host:~$ ssh control-arch-linux-0_net_addr sudo systemctl reboot
+user@host:~$ ssh control-arch-linux-0 sudo systemctl reboot
+```
+
+You can use ready script:
+
+```console
+user@host:~$ ./uninstall.sh
 ```
 
 Controling cluster
@@ -134,7 +140,7 @@ At this moment your cluster should be fine. In order to communicate with the clu
 Save this content on your local machine in `~/.kube/k3s.yaml`.
 
 ```console
-user@host:~$ ssh control-arch-linux-0_net_addr sudo cat /etc/rancher/k3s/k3s.yaml
+user@host:~$ ssh control-arch-linux-0 sudo cat /etc/rancher/k3s/k3s.yaml
 ```
 
 Locate in the file your cluster and modify `server` section. It should point to any of your server machines.
@@ -231,9 +237,9 @@ retail-project-dev   Active   13s
 
 
 ```console
-[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml apply -f simple-rest-golang.yaml
-deployment.apps/simple-rest-golang-deployment created
-service/simple-rest-golang-service created
-ingress.networking.k8s.io/simple-rest-golang-ingress created
+[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml apply -f simple-rest-app.yaml
+deployment.apps/simple-rest-app-deployment created
+service/simple-rest-app-service created
+ingress.networking.k8s.io/simple-rest-app-ingress created
 ```
 

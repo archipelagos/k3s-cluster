@@ -18,8 +18,6 @@ set \
 set \
 	-e
 
-set \
-	-x
 ##############################################################################
 # INFO: Script configuration section.
 ##############################################################################
@@ -69,10 +67,10 @@ done
 for worker in ${WORKERS}
 do
 	ssh \
-		${USER}@${server} \
+		${USER}@${worker} \
 		k3s-agent-uninstall.sh || true
 	ssh \
-		${USER}@${server} \
+		${USER}@${worker} \
 		sudo systemctl reboot || true
 done
 
