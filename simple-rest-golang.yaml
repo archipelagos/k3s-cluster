@@ -50,8 +50,7 @@ metadata:
     kubernetes.io/ingress.class: "traefik"
 spec:
   rules:
-  - host: waw.ddns.net
-    http:
+  - http:
       paths:
       - path: /
         pathType: Prefix

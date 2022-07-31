@@ -218,14 +218,14 @@ Example application
 Create the namespace (only dev)
 
 ```console
-[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml create namespace retail-project-dev
+[user@host cluster]$ ssh control-arch-linux-0_net_addr sudo kubectl create namespace retail-project-dev
 namespace/retail-project-dev created
 ```
 
 Check new namespace.
 
 ```console
-[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml get namespaces
+[user@host cluster]$ ssh control-arch-linux-0_net_addr sudo kubectl get namespaces
 NAME                 STATUS   AGE
 default              Active   16m
 kube-node-lease      Active   16m
