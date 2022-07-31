@@ -2,21 +2,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: simple-rest-golang-deployment
+  name: simple-rest-app-deployment
   namespace: retail-project-dev
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: simple-rest-golang
+      app: simple-rest-app
   template:
     metadata:
       labels:
-        app: simple-rest-golang
+        app: simple-rest-app
     spec:
       containers:
-        - name: simple-rest-golang
-          image: fransafu/simple-rest-golang:1.0.0
+        - name: simple-rest-app
+          image: archipelagos/simple-rest-app:latest
           resources:
             requests:
               memory: "64Mi"
@@ -31,7 +31,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: simple-rest-golang-service
+  name: simple-rest-app-service
   namespace: retail-project-dev
 spec:
   ports:
@@ -39,12 +39,12 @@ spec:
     targetPort: 8080
     name: tcp
   selector:
-    app: simple-rest-golang
+    app: simple-rest-app
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: simple-rest-golang-ingress
+  name: simple-rest-app-ingress
   namespace: retail-project-dev
   annotations:
     kubernetes.io/ingress.class: "traefik"
@@ -56,6 +56,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: simple-rest-golang-service
+            name: simple-rest-app-service
             port:
               number: 80
