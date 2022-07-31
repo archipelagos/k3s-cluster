@@ -200,3 +200,37 @@ kube-system   svclb-traefik-b5140ada-wtn9s              2/2     Running     0   
 kube-system   traefik-7cd4fcff68-pnwh5                  1/1     Running     0          11m
 ```
 
+Check also helm command with fixed configuration.
+
+
+```console
+[user@host cluster]$ helm --kubeconfig ~/.kube/k3s.yaml ls --all-namespaces
+WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/sova/.kube/k3s.yaml
+WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /home/sova/.kube/k3s.yaml
+NAME       	NAMESPACE  	REVISION	UPDATED                                	STATUS  	CHART                	APP VERSION
+traefik    	kube-system	1       	2022-07-31 12:13:12.337007411 +0000 UTC	deployed	traefik-10.19.300    	2.6.2      
+traefik-crd	kube-system	1       	2022-07-31 12:12:25.036720473 +0000 UTC	deployed	traefik-crd-10.19.300
+```
+
+Example application
+-------------------
+
+Create the namespace (only dev)
+
+```console
+[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml create namespace retail-project-dev
+namespace/retail-project-dev created
+```
+
+Check new namespace.
+
+```console
+[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml get namespaces
+NAME                 STATUS   AGE
+default              Active   16m
+kube-node-lease      Active   16m
+kube-public          Active   16m
+kube-system          Active   16m
+retail-project-dev   Active   13s
+```
+
