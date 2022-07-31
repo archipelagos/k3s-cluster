@@ -100,7 +100,7 @@ Installation
 Now you can proceed with further atomatic installation process when you are sure, that your nodes are properly initialized and ready to be used. Just launch script.
 
 ```console
-user@host:~$ ./terraform.sh
+user@host:~$ ./create_cluster.sh
 ```
 
 Troubleshooting
@@ -129,7 +129,7 @@ user@host:~$ ssh control-arch-linux-0 sudo systemctl reboot
 You can use ready script:
 
 ```console
-user@host:~$ ./uninstall.sh
+user@host:~$ ./uninstall_cluster.sh
 ```
 
 Controling cluster
@@ -175,7 +175,7 @@ control-arch-linux-2   Ready    control-plane,etcd,master   22h   v1.24.3+k3s1
 Check existing namespaces.
 
 ```console
-[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml get namespaces
+user@host:~$ kubectl --kubeconfig ~/.kube/k3s.yaml get namespaces
 NAME              STATUS   AGE
 default           Active   11m
 kube-node-lease   Active   11m
@@ -186,7 +186,7 @@ kube-system       Active   11m
 Check existing pods in all namespaes.
 
 ```console
-[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml get pods --all-namespaces
+user@host:~$ kubectl --kubeconfig ~/.kube/k3s.yaml get pods --all-namespaces
 NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE
 kube-system   coredns-b96499967-5mg7z                   1/1     Running     0          13m
 kube-system   helm-install-traefik-5dp7w                0/1     Completed   3          13m
@@ -205,7 +205,7 @@ kube-system   traefik-7cd4fcff68-pnwh5                  1/1     Running     0   
 Check also helm command with fixed configuration.
 
 ```console
-[user@host cluster]$ helm --kubeconfig ~/.kube/k3s.yaml ls --all-namespaces
+user@host:~$ helm --kubeconfig ~/.kube/k3s.yaml ls --all-namespaces
 WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/sova/.kube/k3s.yaml
 WARNING: Kubernetes configuration file is world-readable. This is insecure. Location: /home/sova/.kube/k3s.yaml
 NAME       	NAMESPACE  	REVISION	UPDATED                                	STATUS  	CHART                	APP VERSION
@@ -219,14 +219,14 @@ Example application
 Create the namespace (only dev)
 
 ```console
-[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml create namespace retail-project-dev
+user@host:~$ kubectl --kubeconfig ~/.kube/k3s.yaml create namespace retail-project-dev
 namespace/retail-project-dev created
 ```
 
 Check new namespace.
 
 ```console
-[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml get namespaces
+user@host:~$ kubectl --kubeconfig ~/.kube/k3s.yaml get namespaces
 NAME                 STATUS   AGE
 default              Active   16m
 kube-node-lease      Active   16m
@@ -235,11 +235,44 @@ kube-system          Active   16m
 retail-project-dev   Active   13s
 ```
 
+Apply application.
 
 ```console
-[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml apply -f simple-rest-app.yaml
+user@host:~$ kubectl --kubeconfig ~/.kube/k3s.yaml apply -f simple-rest-app.yaml
 deployment.apps/simple-rest-app-deployment created
 service/simple-rest-app-service created
 ingress.networking.k8s.io/simple-rest-app-ingress created
 ```
+
+Check what happens.
+
+```console
+user@host:~$ watch -n 1 kubectl --kubeconfig ~/.kube/k3s.yaml get svc,ingress,pods -n retail-project-dev
+[sova@notebook cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml get svc,ingress,pods -n retail-project-dev
+NAME                              TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+service/simple-rest-app-service   ClusterIP   10.43.205.199   <none>        80/TCP    3m20s
+
+NAME                                                CLASS    HOSTS   ADDRESS                                                                               PORTS   AGE
+ingress.networking.k8s.io/simple-rest-app-ingress   <none>   *       192.168.1.102,192.168.1.103,192.168.1.104,192.168.1.105,192.168.1.106,192.168.1.107   80      3m17s
+
+NAME                                              READY   STATUS              RESTARTS   AGE
+pod/simple-rest-app-deployment-54df58fdd9-hv5xv   0/1     ContainerCreating   0          3m21s
+pod/simple-rest-app-deployment-54df58fdd9-wqcnb   1/1     Running             0          3m21s
+```
+
+If everything is fine, you can test your application.
+
+```console
+user@host:~$ curl -s waw.ddns.net
+Hostname: simple-rest-app-deployment-54df58fdd9-wqcnb
+```
+
+Try again to see what will be different.
+
+```console
+[sova@notebook cluster]$ curl waw.ddns.net
+Hostname: simple-rest-app-deployment-54df58fdd9-hv5xv
+```
+
+As you can see, two different pods served your requests.
 
