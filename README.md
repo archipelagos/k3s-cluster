@@ -120,6 +120,12 @@ To uninstall K3S from worker node, execute command:
 user@host:~$ ssh control-arch-linux-0_net_addr k3s-agent-uninstall.sh
 ```
 
+To restart node, execute command:
+
+```console
+user@host:~$ ssh control-arch-linux-0_net_addr sudo systemctl reboot
+```
+
 Controling cluster
 ------------------
 
@@ -128,7 +134,7 @@ At this moment your cluster should be fine. In order to communicate with the clu
 Save this content on your local machine in `~/.kube/<your config file>`.
 
 ```console
-user@host:~$ cat /etc/rancher/k3s/k3s.yaml
+user@host:~$ ssh control-arch-linux-0_net_addr sudo cat /etc/rancher/k3s/k3s.yaml
 ```
 
 Locate in the file your cluster and modify `server` section. It should point to any of your server machines.
@@ -139,12 +145,16 @@ Once the steps before are applied, you can execute the following script to load 
 user@host:~$ export KUBECONFIG=/.kube/<your config file>
 ```
 
-Now you should be able to use the cluster.
-
-Check this by executing the following command.
+Now you should be able to use the cluster. Check this by executing the following command.
 
 ```console
 user@host:~$ kubectl get nodes
+```
+
+You do not have to export configuration file, you can embed parameter pointing to configuration file directly in your command.
+
+```console
+user@host:~$ kubectl --kubeconfig ~/.kube/k3s.yaml get nodes
 ```
 
 The result is a list of the available nodes.
@@ -158,5 +168,35 @@ compute-arch-linux-2   Ready    <none>                      22h   v1.24.3+k3s1
 control-arch-linux-0   Ready    control-plane,etcd,master   22h   v1.24.3+k3s1
 control-arch-linux-1   Ready    control-plane,etcd,master   22h   v1.24.3+k3s1
 control-arch-linux-2   Ready    control-plane,etcd,master   22h   v1.24.3+k3s1
+```
+
+Check existing namespaces.
+
+```console
+[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml get namespaces
+NAME              STATUS   AGE
+default           Active   11m
+kube-node-lease   Active   11m
+kube-public       Active   11m
+kube-system       Active   11m
+```
+
+Check existing pods in all namespaes.
+
+```console
+[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml get pods --all-namespaces
+NAMESPACE     NAME                                      READY   STATUS      RESTARTS   AGE
+kube-system   coredns-b96499967-5mg7z                   1/1     Running     0          13m
+kube-system   helm-install-traefik-5dp7w                0/1     Completed   3          13m
+kube-system   helm-install-traefik-crd-4b4cl            0/1     Completed   0          13m
+kube-system   local-path-provisioner-7b7dc8d6f5-7zkh9   1/1     Running     0          13m
+kube-system   metrics-server-668d979685-t8nnp           1/1     Running     0          13m
+kube-system   svclb-traefik-b5140ada-cnhn9              2/2     Running     0          11m
+kube-system   svclb-traefik-b5140ada-nxzlw              2/2     Running     0          11m
+kube-system   svclb-traefik-b5140ada-p8k5f              2/2     Running     0          11m
+kube-system   svclb-traefik-b5140ada-q6vqx              2/2     Running     0          10m
+kube-system   svclb-traefik-b5140ada-wnxzp              2/2     Running     0          11m
+kube-system   svclb-traefik-b5140ada-wtn9s              2/2     Running     0          11m
+kube-system   traefik-7cd4fcff68-pnwh5                  1/1     Running     0          11m
 ```
 
