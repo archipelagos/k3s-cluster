@@ -100,7 +100,7 @@ Installation
 Now you can proceed with further atomatic installation process when you are sure, that your nodes are properly initialized and ready to be used. Just launch script.
 
 ```console
-user@host:~$ ./terraform.sh
+user@host:~$ ./create_cluster.sh
 ```
 
 Troubleshooting
@@ -129,7 +129,7 @@ user@host:~$ ssh control-arch-linux-0 sudo systemctl reboot
 You can use ready script:
 
 ```console
-user@host:~$ ./uninstall.sh
+user@host:~$ ./uninstall_cluster.sh
 ```
 
 Controling cluster
