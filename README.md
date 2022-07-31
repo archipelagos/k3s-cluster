@@ -131,7 +131,7 @@ Controling cluster
 
 At this moment your cluster should be fine. In order to communicate with the cluster retrieve the certificate from any of server nodes.
 
-Save this content on your local machine in `~/.kube/<your config file>`.
+Save this content on your local machine in `~/.kube/k3s.yaml`.
 
 ```console
 user@host:~$ ssh control-arch-linux-0_net_addr sudo cat /etc/rancher/k3s/k3s.yaml
@@ -142,7 +142,7 @@ Locate in the file your cluster and modify `server` section. It should point to 
 Once the steps before are applied, you can execute the following script to load the Kubernetes config.
 
 ```console
-user@host:~$ export KUBECONFIG=/.kube/<your config file>
+user@host:~$ export KUBECONFIG=~/.kube/k3s.yaml
 ```
 
 Now you should be able to use the cluster. Check this by executing the following command.
@@ -153,14 +153,10 @@ user@host:~$ kubectl get nodes
 
 You do not have to export configuration file, you can embed parameter pointing to configuration file directly in your command.
 
-```console
-user@host:~$ kubectl --kubeconfig ~/.kube/k3s.yaml get nodes
-```
-
 The result is a list of the available nodes.
 
 ```console
-user@host:~$ kubectl get nodes
+user@host:~$ kubectl --kubeconfig ~/.kube/k3s.yaml get nodes
 NAME                   STATUS   ROLES                       AGE   VERSION
 compute-arch-linux-0   Ready    <none>                      22h   v1.24.3+k3s1
 compute-arch-linux-1   Ready    <none>                      22h   v1.24.3+k3s1
@@ -202,7 +198,6 @@ kube-system   traefik-7cd4fcff68-pnwh5                  1/1     Running     0   
 
 Check also helm command with fixed configuration.
 
-
 ```console
 [user@host cluster]$ helm --kubeconfig ~/.kube/k3s.yaml ls --all-namespaces
 WARNING: Kubernetes configuration file is group-readable. This is insecure. Location: /home/sova/.kube/k3s.yaml
@@ -218,19 +213,27 @@ Example application
 Create the namespace (only dev)
 
 ```console
-[user@host cluster]$ ssh control-arch-linux-0_net_addr sudo kubectl create namespace retail-project-dev
+[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml create namespace retail-project-dev
 namespace/retail-project-dev created
 ```
 
 Check new namespace.
 
 ```console
-[user@host cluster]$ ssh control-arch-linux-0_net_addr sudo kubectl get namespaces
+[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml get namespaces
 NAME                 STATUS   AGE
 default              Active   16m
 kube-node-lease      Active   16m
 kube-public          Active   16m
 kube-system          Active   16m
 retail-project-dev   Active   13s
+```
+
+
+```console
+[user@host cluster]$ kubectl --kubeconfig ~/.kube/k3s.yaml apply -f simple-rest-golang.yaml
+deployment.apps/simple-rest-golang-deployment created
+service/simple-rest-golang-service created
+ingress.networking.k8s.io/simple-rest-golang-ingress created
 ```
 
