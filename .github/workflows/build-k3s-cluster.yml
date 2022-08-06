@@ -15,4 +15,9 @@ jobs:
         run: |
           ls ${{ github.workspace }}
       - run: echo "* This job's status is ${{ job.status }}."
-
+  Check-system-container:
+    runs-on: arch-linux-latest
+    steps:
+      - name: Check systemctl status
+        run: |
+          systemctl status
