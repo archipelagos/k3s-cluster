@@ -22,6 +22,8 @@ set \
 # INFO: Script configuration section.
 ##############################################################################
 
+K3S_VERSION=v1.23.9+k3s1
+
 # INFO: User on remote nodes.
 USER=sova
 
@@ -67,6 +69,7 @@ do
 		curl -sfL https://get.k3s.io | ssh \
 			${USER}@${server} \
 			K3S_TOKEN=${CLUSTER_SECRET} \
+			INSTALL_K3S_VERSION=${K3S_VERSION} \
 			sh -s - server \
 			--cluster-init
 	else
@@ -74,6 +77,7 @@ do
 		curl -sfL https://get.k3s.io | ssh \
 			${USER}@${server} \
 			K3S_TOKEN=${CLUSTER_SECRET} \
+			INSTALL_K3S_VERSION=${K3S_VERSION} \
 			sh -s - server \
 			--server \
 			https://${FIRST_SERVER}:6443
@@ -90,6 +94,7 @@ for worker in ${WORKERS}
 do
 	curl -sfL https://get.k3s.io | ssh \
 		${USER}@${worker} \
+		INSTALL_K3S_VERSION=${K3S_VERSION} \
 		sh -s - agent \
 		--server \
 		https://${FIRST_SERVER}:6443 \
