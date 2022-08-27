@@ -1,0 +1,7 @@
+[Unit]
+Description=Arch Linux update
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+ExecStart=/bin/sh /usr/share/archlinux/archlinux-update.sh
