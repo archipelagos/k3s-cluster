@@ -32,7 +32,7 @@ LANG=${LOCALE} reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/m
 yes | LANG=${LOCALE} pacman -Sc
 
 # INFO: OPTION 1: Init and populate the GNU PGP trustdb of pacman (the robust but long way).
-LANG=${LOCALE} rm -f /etc/pacman.d/gnupg
+LANG=${LOCALE} rm -rf /etc/pacman.d/gnupg
 LANG=${LOCALE} pacman-key --init
 LANG=${LOCALE} pacman-key --populate archlinux
 
