@@ -24,11 +24,20 @@ set \
 
 LOCALE=en_US.UTF-8
 
+# INFO: Generate mirrorlist for pacman.
+LANG=${LOCALE} rm -f /etc/pacman.d/mirrorlist
+LANG=${LOCALE} reflector --verbose --latest 5 --sort rate --save /etc/pacman.d/mirrorlist
+
 # INFO: Sync and remove old packages from cache directory.
 yes | LANG=${LOCALE} pacman -Sc
 
-# INFO: Update the trustdb of pacman.
-LANG=${LOCALE} pacman-key --updatedb
+# INFO: OPTION 1: Init and populate the GNU PGP trustdb of pacman (the robust but long way).
+LANG=${LOCALE} rm -f /etc/pacman.d/gnupg
+LANG=${LOCALE} pacman-key --init
+LANG=${LOCALE} pacman-key --populate archlinux
+
+# INFO: OPTION 2: Update the trustdb of pacman (if init and populate is not done).
+#LANG=${LOCALE} pacman-key --updatedb
 
 # INFO: Sync and download fresh package databases from the server.
 yes | LANG=${LOCALE} pacman -Sy archlinux-keyring
@@ -39,4 +48,3 @@ yes | LANG=${LOCALE} pacman -Syu
 
 # INFO: Reboot.
 systemctl reboot
-
